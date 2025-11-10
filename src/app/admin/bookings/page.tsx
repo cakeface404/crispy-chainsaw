@@ -1,8 +1,7 @@
 "use client";
 
-import { useCollection } from "@/firebase";
-import { collection, query, where } from "firebase/firestore";
-import { useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
+import { collection } from "firebase/firestore";
 import type { Booking, Service, User } from "@/lib/types";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
@@ -16,15 +15,13 @@ type BookingWithDetails = Booking & {
 export default function BookingsPage() {
   const firestore = useFirestore();
 
-  const { data: bookingsData, isLoading: bookingsLoading } = useCollection<Booking>(
-    firestore ? collection(firestore, "bookings") : null
-  );
-  const { data: servicesData, isLoading: servicesLoading } = useCollection<Service>(
-    firestore ? collection(firestore, "services") : null
-  );
-  const { data: usersData, isLoading: usersLoading } = useCollection<User>(
-    firestore ? collection(firestore, "users") : null
-  );
+  const bookingsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'bookings') : null, [firestore]);
+  const servicesCollection = useMemoFirebase(() => firestore ? collection(firestore, 'services') : null, [firestore]);
+  const usersCollection = useMemoFirebase(() => firestore ? collection(firestore, 'users') : null, [firestore]);
+
+  const { data: bookingsData, isLoading: bookingsLoading } = useCollection<Booking>(bookingsCollection);
+  const { data: servicesData, isLoading: servicesLoading } = useCollection<Service>(servicesCollection);
+  const { data: usersData, isLoading: usersLoading } = useCollection<User>(usersCollection);
 
   const bookingsWithDetails: BookingWithDetails[] = useMemo(() => {
     if (!bookingsData || !servicesData || !usersData) {

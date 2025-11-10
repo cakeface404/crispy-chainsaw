@@ -1,25 +1,21 @@
 "use client";
 
 import InvoiceTemplate from "../invoice-template";
-import { useDoc, useCollection } from "@/firebase";
+import { useDoc, useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { doc, collection } from "firebase/firestore";
-import { useFirestore } from "@/firebase";
 import type { Booking, Service, User } from "@/lib/types";
 
 export default function InvoicePage({ params }: { params: { id: string } }) {
   const firestore = useFirestore();
 
-  const { data: booking, isLoading: bookingLoading } = useDoc<Booking>(
-    firestore ? doc(firestore, "bookings", params.id) : null
-  );
+  const bookingDoc = useMemoFirebase(() => firestore ? doc(firestore, "bookings", params.id) : null, [firestore, params.id]);
+  const { data: booking, isLoading: bookingLoading } = useDoc<Booking>(bookingDoc);
 
-  const { data: services, isLoading: servicesLoading } = useCollection<Service>(
-    firestore ? collection(firestore, "services") : null
-  );
+  const servicesCollection = useMemoFirebase(() => firestore ? collection(firestore, "services") : null, [firestore]);
+  const { data: services, isLoading: servicesLoading } = useCollection<Service>(servicesCollection);
 
-  const { data: users, isLoading: usersLoading } = useCollection<User>(
-    firestore ? collection(firestore, "users") : null
-  );
+  const usersCollection = useMemoFirebase(() => firestore ? collection(firestore, "users") : null, [firestore]);
+  const { data: users, isLoading: usersLoading } = useCollection<User>(usersCollection);
 
   if (bookingLoading || servicesLoading || usersLoading) {
     return <div className="text-center py-10">Loading...</div>;

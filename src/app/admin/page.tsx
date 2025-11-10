@@ -19,9 +19,8 @@ import { Badge } from "@/components/ui/badge";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar } from "recharts";
 import { format } from "date-fns";
-import { useCollection } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
-import { useFirestore } from "@/firebase";
 import type { Booking, Service, User } from "@/lib/types";
 
 const chartData = [
@@ -43,15 +42,13 @@ const chartConfig = {
 export default function AdminDashboard() {
   const firestore = useFirestore();
 
-  const { data: bookingsData, isLoading: bookingsLoading } = useCollection<Booking>(
-    firestore ? collection(firestore, "bookings") : null
-  );
-  const { data: servicesData, isLoading: servicesLoading } = useCollection<Service>(
-    firestore ? collection(firestore, "services") : null
-  );
-  const { data: usersData, isLoading: usersLoading } = useCollection<User>(
-    firestore ? collection(firestore, "users") : null
-  );
+  const bookingsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'bookings') : null, [firestore]);
+  const servicesCollection = useMemoFirebase(() => firestore ? collection(firestore, 'services') : null, [firestore]);
+  const usersCollection = useMemoFirebase(() => firestore ? collection(firestore, 'users') : null, [firestore]);
+
+  const { data: bookingsData, isLoading: bookingsLoading } = useCollection<Booking>(bookingsCollection);
+  const { data: servicesData, isLoading: servicesLoading } = useCollection<Service>(servicesCollection);
+  const { data: usersData, isLoading: usersLoading } = useCollection<User>(usersCollection);
 
   if (bookingsLoading || servicesLoading || usersLoading) {
     return <div>Loading...</div>
