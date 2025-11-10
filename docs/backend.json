@@ -1,0 +1,327 @@
+{
+  "entities": {
+    "Service": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Service",
+      "type": "object",
+      "description": "Represents a service offered by the studio.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the service."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the service."
+        },
+        "description": {
+          "type": "string",
+          "description": "Detailed description of the service."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the service."
+        },
+        "duration": {
+          "type": "number",
+          "description": "Duration of the service in minutes."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image representing the service."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the service (e.g., Haircut, Coloring)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "duration",
+        "imageUrl",
+        "category"
+      ]
+    },
+    "Booking": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Booking",
+      "type": "object",
+      "description": "Represents a booking made by a client.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the booking."
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "Reference to Service. (Relationship: Service 1:N Booking)"
+        },
+        "clientId": {
+          "type": "string",
+          "description": "Unique identifier for the client making the booking.  Links to authentication system's user ID."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the booking.",
+          "format": "date-time"
+        },
+        "time": {
+          "type": "string",
+          "description": "Time of the booking."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the booking (e.g., Pending, Confirmed, Declined)."
+        },
+        "paymentStatus": {
+          "type": "string",
+          "description": "Payment status of the booking (e.g., Paid, Unpaid)."
+        },
+        "invoiceId": {
+          "type": "string",
+          "description": "Reference to Invoice. (Relationship: Invoice 1:1 Booking)",
+          "format": "uuid"
+        }
+      },
+      "required": [
+        "id",
+        "serviceId",
+        "clientId",
+        "date",
+        "time",
+        "status",
+        "paymentStatus"
+      ]
+    },
+    "Invoice": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Invoice",
+      "type": "object",
+      "description": "Represents an invoice for a booking.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the invoice."
+        },
+        "bookingId": {
+          "type": "string",
+          "description": "Reference to Booking. (Relationship: Booking 1:1 Invoice)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Total amount of the invoice."
+        },
+        "dateIssued": {
+          "type": "string",
+          "description": "Date the invoice was issued.",
+          "format": "date-time"
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "Date the invoice is due.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the invoice (e.g., Paid, Unpaid, Overdue)."
+        }
+      },
+      "required": [
+        "id",
+        "bookingId",
+        "amount",
+        "dateIssued",
+        "dueDate",
+        "status"
+      ]
+    },
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Represents a physical product sold by the studio.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the product."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the product."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image representing the product."
+        },
+        "stockQuantity": {
+          "type": "number",
+          "description": "Number of units of the product in stock."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "price",
+        "imageUrl",
+        "stockQuantity"
+      ]
+    },
+    "GalleryImage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "GalleryImage",
+      "type": "object",
+      "description": "Represents an image in the gallery.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the gallery image."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL of the image."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the image."
+        },
+        "uploadDate": {
+          "type": "string",
+          "description": "Date the image was uploaded.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "imageUrl",
+        "uploadDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/services/{serviceId}",
+        "definition": {
+          "entityName": "Service",
+          "schema": {
+            "$ref": "#/backend/entities/Service"
+          },
+          "description": "Stores information about services offered by the studio. Publicly accessible.",
+          "params": [
+            {
+              "name": "serviceId",
+              "description": "Unique identifier for the service."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/bookings/{bookingId}",
+        "definition": {
+          "entityName": "Booking",
+          "schema": {
+            "$ref": "#/backend/entities/Booking"
+          },
+          "description": "Stores booking information for each user. Path-based ownership ensures only the user can access their own bookings.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Unique identifier for the user (client)."
+            },
+            {
+              "name": "bookingId",
+              "description": "Unique identifier for the booking."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/invoices/{invoiceId}",
+        "definition": {
+          "entityName": "Invoice",
+          "schema": {
+            "$ref": "#/backend/entities/Invoice"
+          },
+          "description": "Stores invoice information for each user. Path-based ownership.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "Unique identifier for the user (client)."
+            },
+            {
+              "name": "invoiceId",
+              "description": "Unique identifier for the invoice."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/products/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Stores information about products sold by the studio. Publicly accessible.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "Unique identifier for the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/gallery_images/{galleryImageId}",
+        "definition": {
+          "entityName": "GalleryImage",
+          "schema": {
+            "$ref": "#/backend/entities/GalleryImage"
+          },
+          "description": "Stores URLs for images in the gallery. Publicly accessible.",
+          "params": [
+            {
+              "name": "galleryImageId",
+              "description": "Unique identifier for the gallery image."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "user",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection to store admin roles.  Existence of a document indicates admin role.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "User ID of the admin."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to support the Blak Whyte Studio Hub application, emphasizing security, scalability, and maintainability. It leverages path-based ownership for user-specific data and segregation of public and private data.\n\n*   **Services (Public):** The `services` collection stores information about services offered. It is publicly accessible for reading to showcase services on the UI. This aligns with the 'Service Showcase' feature.\n*   **Bookings (User-Owned):** Bookings are stored within user-specific subcollections (`/users/{userId}/bookings/{bookingId}`). This ensures that each user can only manage their own bookings. Authorization Independence is maintained as access control relies solely on the user's `uid` and path-based ownership, eliminating the need for `get()` calls in security rules. This supports the 'Online Booking System' and allows for easy retrieval of a user's booking history.\n*   **Invoices (User-Owned):** Invoices are stored similarly to bookings, nested under the user's document. This maintains a clear ownership structure and simplifies security rules.\n*   **Products (Public):** Products are stored in a public `products` collection, accessible for reading by all users. This supports the 'Product Display' feature.\n*   **Gallery Images (Public):** Gallery images are stored in a public `gallery_images` collection. This allows for easy display of the salon's work.\n*   **Admin Roles:** The `roles_admin` collection will be used to store the id of the users that are Admins, ensuring an existence over content approach.\n\nThis structure supports the required QAPs by:\n\n*   **Segregation:** Separating public data (services, products, gallery images) from user-specific data (bookings, invoices) simplifies security rules and allows for efficient querying.\n*   **Path-Based Ownership:** Using hierarchical paths (`/users/{userId}/bookings/{bookingId}`) enforces clear ownership and eliminates the need for complex authorization logic.\nAuthorization Independence is achieved by avoiding hierarchical authorization dependencies (`get()`). The structure does not rely on parent data for authorization decisions. All necessary information for access control is either inherent in the path (user ID) or directly available within the document itself. This ensures atomic operations (transactions/batches) and improves debuggability.\n\nThis design adheres to the core principles of Authorization Independence, Clarity of Intent, DBAC, and QAPs."
+  }
+}
