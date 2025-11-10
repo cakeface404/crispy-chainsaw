@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
@@ -6,6 +7,7 @@ import type { Booking, Service, User } from "@/lib/types";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { useMemo } from "react";
+import { useAuth } from "@/firebase/provider";
 
 type BookingWithDetails = Booking & {
   service: Service | undefined;
@@ -14,10 +16,12 @@ type BookingWithDetails = Booking & {
 
 export default function BookingsPage() {
   const firestore = useFirestore();
+  const { user, isUserLoading } = useAuth();
 
-  const bookingsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'bookings') : null, [firestore]);
-  const servicesCollection = useMemoFirebase(() => firestore ? collection(firestore, 'services') : null, [firestore]);
-  const usersCollection = useMemoFirebase(() => firestore ? collection(firestore, 'users') : null, [firestore]);
+  // Only define collections if firestore and user are available
+  const bookingsCollection = useMemoFirebase(() => (firestore && user) ? collection(firestore, 'bookings') : null, [firestore, user]);
+  const servicesCollection = useMemoFirebase(() => (firestore && user) ? collection(firestore, 'services') : null, [firestore, user]);
+  const usersCollection = useMemoFirebase(() => (firestore && user) ? collection(firestore, 'users') : null, [firestore, user]);
 
   const { data: bookingsData, isLoading: bookingsLoading } = useCollection<Booking>(bookingsCollection);
   const { data: servicesData, isLoading: servicesLoading } = useCollection<Service>(servicesCollection);
@@ -34,7 +38,9 @@ export default function BookingsPage() {
     }));
   }, [bookingsData, servicesData, usersData]);
 
-  if (bookingsLoading || servicesLoading || usersLoading) {
+  const isLoading = isUserLoading || bookingsLoading || servicesLoading || usersLoading;
+
+  if (isLoading) {
     return <div>Loading bookings...</div>;
   }
 
