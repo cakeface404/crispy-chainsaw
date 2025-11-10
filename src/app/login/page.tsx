@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { signInWithEmailAndPassword, getIdToken } from 'firebase/auth';
+import { signInWithEmailAndPassword, getIdToken, onAuthStateChanged } from 'firebase/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -19,6 +19,36 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
+  useEffect(() => {
+    if (!auth) return;
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // User is signed in.
+        try {
+          const idTokenResult = await user.getIdTokenResult();
+          if (idTokenResult.claims.admin) {
+            // If they are an admin, redirect to the admin panel.
+            router.push('/admin');
+          } else {
+            // If they are not an admin, sign them out and show an error.
+            await auth.signOut();
+            toast({ variant: 'destructive', title: 'Access Denied', description: 'You do not have permission to access the admin panel.' });
+          }
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+          setIsLoading(false);
+        }
+      } else {
+        // User is signed out.
+        setIsLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth, router, toast]);
+
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth) {
@@ -27,14 +57,10 @@ export default function LoginPage() {
     }
     setIsLoading(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Get the ID token and set it in a cookie
-      const idToken = await getIdToken(userCredential.user);
-      document.cookie = `idToken=${idToken}; path=/; max-age=3600`; // Set cookie for 1 hour
-
-      toast({ title: 'Success', description: 'Signed in successfully.' });
-      router.push('/admin');
+      await signInWithEmailAndPassword(auth, email, password);
+      // The onAuthStateChanged listener will handle the redirect.
+      // We can show a pending toast here.
+      toast({ title: 'Signing In...', description: 'Please wait while we verify your credentials.' });
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Authentication Failed', description: error.message });
       setIsLoading(false);
