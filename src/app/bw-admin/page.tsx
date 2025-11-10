@@ -14,7 +14,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, BarChart, Bar } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar } from "recharts";
 import { bookings, services, users } from "@/lib/data";
 import { format } from "date-fns";
 
