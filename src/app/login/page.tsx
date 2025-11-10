@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -9,46 +9,21 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { signInWithEmailAndPassword, getIdToken, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const auth = useAuth();
+  const { auth, isAuthLoading, isAdmin } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (!auth) return;
-
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // User is signed in.
-        try {
-          const idTokenResult = await user.getIdTokenResult();
-          if (idTokenResult.claims.admin) {
-            // If they are an admin, redirect to the admin panel.
-            router.push('/admin');
-          } else {
-            // If they are not an admin, sign them out and show an error.
-            await auth.signOut();
-            toast({ variant: 'destructive', title: 'Access Denied', description: 'You do not have permission to access the admin panel.' });
-          }
-        } catch (error) {
-          console.error("Error checking admin status:", error);
-          setIsLoading(false);
-        }
-      } else {
-        // User is signed out.
-        setIsLoading(false);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [auth, router, toast]);
-
-
+  // This effect will run when auth state is resolved, and redirects if already logged in as admin.
+  if (!isAuthLoading && isAdmin) {
+    router.push('/admin');
+  }
+  
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth) {
@@ -58,11 +33,11 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // The onAuthStateChanged listener will handle the redirect.
-      // We can show a pending toast here.
+      // The `onAuthStateChanged` listener in the main Firebase provider (`useAuth` hook)
+      // will now handle the state change and the redirect will be triggered by the AdminLayout.
       toast({ title: 'Signing In...', description: 'Please wait while we verify your credentials.' });
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Authentication Failed', description: error.message });
+      toast({ variant: 'destructive', title: 'Authentication Failed', description: 'The email or password you entered is incorrect.' });
       setIsLoading(false);
     }
   };
