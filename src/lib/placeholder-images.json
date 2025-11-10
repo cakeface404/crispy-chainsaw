@@ -1,3 +1,118 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "Elegant salon interior",
+      "imageUrl": "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzYWxvbiUyMGludGVyaW9yfGVufDB8fHx8MTc2Mjc2Mzc3MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "salon interior"
+    },
+    {
+      "id": "service_manicure",
+      "description": "A close-up of a luxury manicure",
+      "imageUrl": "https://images.unsplash.com/photo-1674383600495-bfa0405f3c93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtYW5pY3VyZSUyMG5haWxzfGVufDB8fHx8MTc2MjcwNDgzN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "manicure nails"
+    },
+    {
+      "id": "service_pedicure",
+      "description": "A relaxing pedicure session",
+      "imageUrl": "https://images.unsplash.com/photo-1632504102499-7dc472b50653?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwZWRpY3VyZSUyMHNwYXxlbnwwfHx8fDE3NjI3Mzg2MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "pedicure spa"
+    },
+    {
+      "id": "service_facial",
+      "description": "Woman receiving a facial treatment",
+      "imageUrl": "https://images.unsplash.com/photo-1643684460412-76908d8e5a25?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmYWNpYWwlMjB0cmVhdG1lbnR8ZW58MHx8fHwxNzYyNzA0ODM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "facial treatment"
+    },
+    {
+      "id": "service_hair",
+      "description": "Stylist working on a balayage",
+      "imageUrl": "https://images.unsplash.com/photo-1712641970791-ea9a566c93bc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxoYWlyJTIwc3R5bGluZ3xlbnwwfHx8fDE3NjI3NzgzMzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hair styling"
+    },
+    {
+      "id": "service_makeup",
+      "description": "Professional makeup application",
+      "imageUrl": "https://images.unsplash.com/photo-1636023730877-233b9237d4ec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxtYWtldXAlMjBhcnRpc3R8ZW58MHx8fHwxNzYyNzgzNjM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "makeup artist"
+    },
+    {
+      "id": "service_massage",
+      "description": "A serene massage therapy room",
+      "imageUrl": "https://images.unsplash.com/photo-1591343395082-e120087004b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxtYXNzYWdlJTIwdGhlcmFweXxlbnwwfHx8fDE3NjI3MjE4MjF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "massage therapy"
+    },
+    {
+      "id": "product_cream",
+      "description": "A jar of hydrating face cream",
+      "imageUrl": "https://images.unsplash.com/photo-1612817288484-6f916006741a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxza2luY2FyZSUyMHByb2R1Y3R8ZW58MHx8fHwxNzYyNzc4NDA0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "skincare product"
+    },
+    {
+      "id": "product_serum",
+      "description": "A bottle of vitamin c serum",
+      "imageUrl": "https://images.unsplash.com/photo-1526947425960-945c6e72858f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxiZWF1dHklMjBwcm9kdWN0fGVufDB8fHx8MTc2Mjc2ODM2MXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beauty product"
+    },
+    {
+      "id": "product_oil",
+      "description": "A bottle of nourishing hair oil",
+      "imageUrl": "https://images.unsplash.com/photo-1712112797786-d43620cac1fd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxoYWlyJTIwcHJvZHVjdHxlbnwwfHx8fDE3NjI3NjgzNjB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hair product"
+    },
+    {
+      "id": "product_cuticle",
+      "description": "A cuticle care pen",
+      "imageUrl": "https://images.unsplash.com/photo-1612239395391-dab5de40aa0f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxuYWlsJTIwY2FyZXxlbnwwfHx8fDE3NjI3MDc0NzB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "nail care"
+    },
+    {
+      "id": "gallery_1_img",
+      "description": "Stylish haircut and color",
+      "imageUrl": "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxoYWlyJTIwbW9kZWx8ZW58MHx8fHwxNzYyNzgzNjM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hair model"
+    },
+    {
+      "id": "gallery_2_img",
+      "description": "Elegant nail art design",
+      "imageUrl": "https://images.unsplash.com/photo-1619607146034-5a05296c8f9a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxuYWlsJTIwYXJ0fGVufDB8fHx8MTc2MjcwNzQ3MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "nail art"
+    },
+    {
+      "id": "gallery_3_img",
+      "description": "Flawless makeup look",
+      "imageUrl": "https://images.unsplash.com/photo-1581182815808-b6eb627a8798?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxiZWF1dHklMjBtb2RlbHxlbnwwfHx8fDE3NjI3ODM2Mzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "beauty model"
+    },
+    {
+      "id": "gallery_4_img",
+      "description": "Intricate hair braiding",
+      "imageUrl": "https://picsum.photos/seed/gal4/400/500",
+      "image Hint": "braided hair"
+    },
+    {
+      "id": "gallery_5_img",
+      "description": "A bride with elegant makeup",
+      "imageUrl": "https://images.unsplash.com/photo-1684868682581-4cac3af5b8d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxicmlkYWwlMjBtYWtldXB8ZW58MHx8fHwxNzYyNzgzNjM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "bridal makeup"
+    },
+    {
+      "id": "gallery_6_img",
+      "description": "Creative nail polish art",
+      "imageUrl": "https://images.unsplash.com/photo-1737214475537-2ccc466876ce?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtYW5pY3VyZSUyMGRlc2lnbnxlbnwwfHx8fDE3NjI3ODM2Mzh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "manicure design"
+    },
+    {
+      "id": "gallery_7_img",
+      "description": "A refreshing skincare moment",
+      "imageUrl": "https://images.unsplash.com/photo-1586220742613-b731f66f7743?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxza2luY2FyZSUyMHJvdXRpbmV8ZW58MHx8fHwxNzYyNzE4MDAzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "skincare routine"
+    },
+    {
+      "id": "gallery_8_img",
+      "description": "Vibrant and bold hair color",
+      "imageUrl": "https://images.unsplash.com/photo-1546561925-a427a021303a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb2xvcmZ1bCUyMGhhaXJ8ZW58MHx8fHwxNzYyNzgzNjM4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "colorful hair"
+    }
+  ]
 }
