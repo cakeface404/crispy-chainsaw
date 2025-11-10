@@ -1,3 +1,5 @@
+"use client";
+
 import { DollarSign, Users, Calendar, Sparkles } from "lucide-react";
 import {
   Card,
