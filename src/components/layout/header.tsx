@@ -12,7 +12,7 @@ const navLinks = [
   { href: "/services", label: "Services" },
   { href: "/gallery", label: "Gallery" },
   { href: "/products", label: "Products" },
-  { href: "/bw-admin", label: "Admin" },
+  { href: "/admin", label: "Admin" },
 ];
 
 export default function Header() {
