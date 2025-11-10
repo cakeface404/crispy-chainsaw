@@ -1,3 +1,4 @@
+
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import type { Booking, Service, User } from "@/lib/types"
+import { sanitizePhoneNumberForWhatsApp } from "@/lib/utils"
 
 export type BookingWithDetails = Booking & {
   service: Service | undefined;
@@ -118,7 +120,7 @@ export const columns: ColumnDef<BookingWithDetails>[] = [
             <DropdownMenuItem>Decline Booking</DropdownMenuItem>
             <DropdownMenuItem>Mark as Paid</DropdownMenuItem>
             <DropdownMenuItem>
-              <a href={`https://wa.me/${booking.user?.phone}`} target="_blank" rel="noopener noreferrer">
+              <a href={`https://wa.me/${sanitizePhoneNumberForWhatsApp(booking.user?.phone || '')}`} target="_blank" rel="noopener noreferrer">
                 Contact (WhatsApp)
               </a>
             </DropdownMenuItem>

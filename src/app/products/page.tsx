@@ -1,9 +1,9 @@
+
 "use client";
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { ShoppingCart } from "lucide-react";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
 import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
@@ -54,10 +54,6 @@ export default function ProductsPage() {
                 </CardContent>
                 <CardFooter className="flex justify-between items-center">
                   <p className="font-bold text-lg text-primary">R{product.price.toFixed(2)}</p>
-                  <Button variant="outline" size="icon" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
-                    <ShoppingCart className="h-4 w-4" />
-                    <span className="sr-only">Add to Cart</span>
-                  </Button>
                 </CardFooter>
               </Card>
             ))}
