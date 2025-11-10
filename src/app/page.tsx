@@ -1,20 +1,31 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { services, galleryImages } from "@/lib/data";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
+import { useCollection, useFirestore } from "@/firebase";
+import { collection } from "firebase/firestore";
+import type { Service, GalleryImage } from "@/lib/types";
+import { useMemo } from "react";
 
 export default function Home() {
-  const featuredServices = services.slice(0, 3);
-  const featuredImages = galleryImages.slice(0, 4);
+  const firestore = useFirestore();
 
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero');
+  const servicesCollection = useMemo(() => firestore ? collection(firestore, 'services') : null, [firestore]);
+  const galleryCollection = useMemo(() => firestore ? collection(firestore, 'gallery') : null, [firestore]);
+  
+  const { data: services, isLoading: servicesLoading } = useCollection<Service>(servicesCollection);
+  const { data: galleryImages, isLoading: galleryLoading } = useCollection<GalleryImage>(galleryCollection);
+
+  const featuredServices = services ? services.slice(0, 3) : [];
+  const featuredImages = galleryImages ? galleryImages.slice(0, 4) : [];
+  const heroImage = galleryImages ? galleryImages.find(img => img.id === 'hero') : null;
 
   return (
     <div className="relative flex min-h-screen flex-col">
@@ -25,11 +36,14 @@ export default function Home() {
             <Image
               src={heroImage.imageUrl}
               alt={heroImage.description}
-              data-ai-hint={heroImage.imageHint}
+              data-ai-hint={heroImage.description}
               fill
               className="object-cover object-center brightness-50"
               priority
             />
+          )}
+          {!heroImage && (
+             <div className="absolute inset-0 bg-black/50"></div>
           )}
           <div className="relative container px-4 md:px-6 z-10">
             <div className="max-w-3xl mx-auto">
@@ -64,37 +78,34 @@ export default function Home() {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredServices.map((service) => {
-                const serviceImage = PlaceHolderImages.find(img => img.id === service.imageId);
-                return (
-                  <Card key={service.id} className="overflow-hidden group shadow-lg hover:shadow-xl transition-shadow duration-300">
-                    <CardContent className="p-0">
-                      <div className="relative h-64 w-full">
-                         {serviceImage && (
-                          <Image
-                            src={serviceImage.imageUrl}
-                            alt={service.name}
-                            data-ai-hint={serviceImage.imageHint}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        )}
+              {servicesLoading && <p>Loading services...</p>}
+              {featuredServices.map((service) => (
+                <Card key={service.id} className="overflow-hidden group shadow-lg hover:shadow-xl transition-shadow duration-300">
+                  <CardContent className="p-0">
+                    <div className="relative h-64 w-full">
+                       {service.imageUrl && (
+                        <Image
+                          src={service.imageUrl}
+                          alt={service.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      )}
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-headline font-semibold text-foreground">{service.name}</h3>
+                      <p className="mt-2 text-muted-foreground line-clamp-2">{service.description}</p>
+                      <div className="mt-4 flex justify-between items-center">
+                        <p className="text-lg font-semibold text-primary">R{service.price.toFixed(2)}</p>
+                        <p className="text-sm text-muted-foreground">{service.duration} mins</p>
                       </div>
-                      <div className="p-6">
-                        <h3 className="text-xl font-headline font-semibold text-foreground">{service.name}</h3>
-                        <p className="mt-2 text-muted-foreground line-clamp-2">{service.description}</p>
-                        <div className="mt-4 flex justify-between items-center">
-                          <p className="text-lg font-semibold text-primary">${service.price.toFixed(2)}</p>
-                          <p className="text-sm text-muted-foreground">{service.duration} mins</p>
-                        </div>
-                        <Button asChild className="mt-6 w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-                          <Link href="/book">Book Service</Link>
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+                      <Button asChild className="mt-6 w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                        <Link href={`/book?service=${service.id}`}>Book Service</Link>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
@@ -108,23 +119,21 @@ export default function Home() {
               </p>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {featuredImages.map((image, index) => {
-                const galleryImage = PlaceHolderImages.find(img => img.id === image.id);
-                return (
-                  <div key={image.id} className={cn("overflow-hidden rounded-lg shadow-lg", index >= 2 && 'hidden md:block')}>
-                     {galleryImage && (
-                      <Image
-                        src={galleryImage.imageUrl}
-                        alt={galleryImage.description}
-                        data-ai-hint={galleryImage.imageHint}
-                        width={400}
-                        height={500}
-                        className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
-                      />
-                    )}
-                  </div>
-                );
-              })}
+              {galleryLoading && <p>Loading gallery...</p>}
+              {featuredImages.map((image, index) => (
+                <div key={image.id} className={cn("overflow-hidden rounded-lg shadow-lg", index >= 2 && 'hidden md:block')}>
+                   {image.imageUrl && (
+                    <Image
+                      src={image.imageUrl}
+                      alt={image.description}
+                      data-ai-hint={image.description}
+                      width={400}
+                      height={500}
+                      className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
             <div className="text-center mt-12">
               <Button asChild size="lg" variant="outline" className="text-primary border-primary hover:bg-primary hover:text-primary-foreground">

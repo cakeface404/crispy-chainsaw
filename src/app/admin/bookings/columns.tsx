@@ -52,10 +52,12 @@ export const columns: ColumnDef<BookingWithDetails>[] = [
     header: "Service",
   },
   {
-    accessorKey: "bookingDate",
+    accessorKey: "date",
     header: "Booking Date",
     cell: ({ row }) => {
-      return format(new Date(row.getValue("bookingDate")), "PPpp");
+      const booking = row.original;
+      const date = new Date(booking.date);
+      return format(date, "PPpp");
     },
   },
   {
@@ -63,9 +65,9 @@ export const columns: ColumnDef<BookingWithDetails>[] = [
     header: () => <div className="text-right">Amount</div>,
     cell: ({ row }) => {
       const amount = parseFloat(row.original.service?.price.toString() || '0')
-      const formatted = new Intl.NumberFormat("en-US", {
+      const formatted = new Intl.NumberFormat("en-ZA", {
         style: "currency",
-        currency: "USD",
+        currency: "ZAR",
       }).format(amount)
  
       return <div className="text-right font-medium">{formatted}</div>

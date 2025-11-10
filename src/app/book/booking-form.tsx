@@ -1,23 +1,27 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { format, add } from 'date-fns';
+import { format } from 'date-fns';
 import { Calendar as CalendarIcon, CheckCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { collection, doc, setDoc } from 'firebase/firestore';
 
-import { services } from '@/lib/data';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import type { Service } from '@/lib/types';
+import { useFirestore, useCollection, useUser } from '@/firebase';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -38,16 +42,21 @@ export default function BookingForm() {
   
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const firestore = useFirestore();
+  const { user } = useUser();
+
+  const servicesCollection = useMemo(() => firestore ? collection(firestore, 'services') : null, [firestore]);
+  const { data: services, isLoading: servicesLoading } = useCollection<Service>(servicesCollection);
 
   useEffect(() => {
     const serviceId = searchParams.get('service');
-    if (serviceId) {
+    if (serviceId && services) {
       const service = services.find(s => s.id === serviceId);
       if (service) {
         setSelectedService(service);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, services]);
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,14 +64,49 @@ export default function BookingForm() {
     defaultValues: { name: "", email: "", phone: "" },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log({
-      service: selectedService?.name,
-      date: selectedDate ? format(selectedDate, 'PPP') : 'N/A',
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!selectedService || !selectedDate || !selectedTime || !firestore) {
+      toast({
+        variant: "destructive",
+        title: "Booking Failed",
+        description: "Please ensure all fields are selected.",
+      });
+      return;
+    }
+
+    const bookingId = uuidv4();
+    const clientId = user ? user.uid : uuidv4(); 
+    
+    if (!user) {
+        const userRef = doc(firestore, "users", clientId);
+        setDoc(userRef, { ...values, id: clientId });
+    }
+
+    const bookingDateTime = new Date(selectedDate);
+    const [hours, minutes, period] = selectedTime.match(/(\d+):(\d+) (AM|PM)/)!.slice(1);
+    let numericHours = parseInt(hours);
+    if (period === 'PM' && numericHours !== 12) {
+      numericHours += 12;
+    }
+    if (period === 'AM' && numericHours === 12) {
+      numericHours = 0;
+    }
+    bookingDateTime.setHours(numericHours, parseInt(minutes));
+
+    const bookingData = {
+      id: bookingId,
+      serviceId: selectedService.id,
+      clientId: clientId,
+      date: bookingDateTime.toISOString(),
       time: selectedTime,
-      ...values,
-    });
-    setStep(4); // Move to confirmation step
+      status: 'Pending',
+      paymentStatus: 'Unpaid',
+    };
+
+    const bookingsCollection = collection(firestore, 'bookings');
+    await addDocumentNonBlocking(bookingsCollection, bookingData);
+
+    setStep(4);
   };
 
   const nextStep = () => setStep(prev => prev + 1);
@@ -84,7 +128,7 @@ export default function BookingForm() {
         <CardContent className="p-10 text-center">
           <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
           <h2 className="text-2xl font-bold mb-2">Booking Confirmed!</h2>
-          <p className="text-muted-foreground mb-6">Thank you for booking with us. An email confirmation has been sent to {form.getValues('email')}.</p>
+          <p className="text-muted-foreground mb-6">Thank you for booking with us. A confirmation has been made.</p>
           <div className="text-left bg-muted/50 rounded-lg p-4 space-y-2">
             <p><strong>Service:</strong> {selectedService?.name}</p>
             <p><strong>Date:</strong> {selectedDate && format(selectedDate, 'EEEE, MMMM d, yyyy')} at {selectedTime}</p>
@@ -115,13 +159,14 @@ export default function BookingForm() {
           <div>
             <h3 className="font-semibold mb-4">Our Services</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {services.map(service => (
+              {servicesLoading && <p>Loading services...</p>}
+              {services && services.map(service => (
                 <Button key={service.id} variant="outline" className="h-auto py-4 text-left flex justify-between" onClick={() => handleServiceSelect(service)}>
                   <div>
                     <p className="font-semibold">{service.name}</p>
                     <p className="text-xs text-muted-foreground">{service.duration} mins</p>
                   </div>
-                  <p className="font-bold text-primary">${service.price}</p>
+                  <p className="font-bold text-primary">R{service.price}</p>
                 </Button>
               ))}
             </div>

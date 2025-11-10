@@ -20,6 +20,18 @@ export default function InvoiceTemplate({ booking, user, service }: InvoiceTempl
     window.print();
   };
 
+  const amount = parseFloat(service?.price.toString() || '0')
+  const formattedAmount = new Intl.NumberFormat("en-ZA", {
+    style: "currency",
+    currency: "ZAR",
+  }).format(amount)
+
+  const formattedTotal = new Intl.NumberFormat("en-ZA", {
+    style: "currency",
+    currency: "ZAR",
+  }).format(amount)
+
+
   return (
     <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
       <div className="flex justify-end mb-4 no-print">
@@ -49,7 +61,7 @@ export default function InvoiceTemplate({ booking, user, service }: InvoiceTempl
             </div>
             <div className="text-right">
               <p><span className="font-semibold">Invoice Date:</span> {format(new Date(), 'PPP')}</p>
-              <p><span className="font-semibold">Booking Date:</span> {format(booking.bookingDate, 'PPP')}</p>
+              <p><span className="font-semibold">Booking Date:</span> {format(new Date(booking.date), 'PPP')}</p>
               <p><span className="font-semibold">Status:</span> <span className="font-bold text-primary">{booking.paymentStatus}</span></p>
             </div>
           </div>
@@ -66,7 +78,7 @@ export default function InvoiceTemplate({ booking, user, service }: InvoiceTempl
               <TableRow>
                 <TableCell className="font-medium">{service.name}</TableCell>
                 <TableCell className="text-right">{service.duration} mins</TableCell>
-                <TableCell className="text-right">${service.price.toFixed(2)}</TableCell>
+                <TableCell className="text-right">{formattedAmount}</TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -77,16 +89,16 @@ export default function InvoiceTemplate({ booking, user, service }: InvoiceTempl
             <div className="w-full max-w-xs space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${service.price.toFixed(2)}</span>
+                <span>{formattedAmount}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax (0%)</span>
-                <span>$0.00</span>
+                <span>R0.00</span>
               </div>
               <Separator />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span className="text-primary">${service.price.toFixed(2)}</span>
+                <span className="text-primary">{formattedTotal}</span>
               </div>
             </div>
           </div>

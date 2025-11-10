@@ -1,3 +1,5 @@
+"use client";
+
 import { DollarSign, Users, Calendar, Sparkles } from "lucide-react";
 import {
   Card,
@@ -14,9 +16,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, BarChart, Bar } from "@/components/ui/chart";
-import { bookings, services, users } from "@/lib/data";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { BarChart, Bar } from "recharts";
 import { format } from "date-fns";
+import { useCollection } from "@/firebase";
+import { collection } from "firebase/firestore";
+import { useFirestore } from "@/firebase";
+import type { Booking, Service, User } from "@/lib/types";
 
 const chartData = [
   { month: "January", revenue: 1860 },
@@ -35,6 +41,27 @@ const chartConfig = {
 };
 
 export default function AdminDashboard() {
+  const firestore = useFirestore();
+
+  const { data: bookingsData, isLoading: bookingsLoading } = useCollection<Booking>(
+    firestore ? collection(firestore, "bookings") : null
+  );
+  const { data: servicesData, isLoading: servicesLoading } = useCollection<Service>(
+    firestore ? collection(firestore, "services") : null
+  );
+  const { data: usersData, isLoading: usersLoading } = useCollection<User>(
+    firestore ? collection(firestore, "users") : null
+  );
+
+  if (bookingsLoading || servicesLoading || usersLoading) {
+    return <div>Loading...</div>
+  }
+
+  const bookings = bookingsData || [];
+  const services = servicesData || [];
+  const users = usersData || [];
+
+
   const totalRevenue = bookings
     .filter(b => b.paymentStatus === 'Paid')
     .reduce((acc, b) => {
@@ -44,7 +71,7 @@ export default function AdminDashboard() {
 
   const totalBookings = bookings.length;
   const recentBookings = bookings
-    .sort((a, b) => b.bookingDate.getTime() - a.bookingDate.getTime())
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 5);
 
   return (
@@ -56,7 +83,7 @@ export default function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">R{totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -121,7 +148,7 @@ export default function AdminDashboard() {
               </TableHeader>
               <TableBody>
                 {recentBookings.map((booking) => {
-                  const user = users.find((u) => u.id === booking.userId);
+                  const user = users.find((u) => u.id === booking.clientId);
                   const service = services.find((s) => s.id === booking.serviceId);
                   return (
                     <TableRow key={booking.id}>

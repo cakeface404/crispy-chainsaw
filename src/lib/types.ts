@@ -5,7 +5,7 @@ export interface Service {
   price: number;
   duration: number; // in minutes
   category: string;
-  imageId: string;
+  imageUrl: string;
 }
 
 export interface Product {
@@ -13,14 +13,15 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  imageId: string;
+  imageUrl: string;
 }
 
 export interface Booking {
   id: string;
-  userId: string;
+  clientId: string;
   serviceId: string;
-  bookingDate: Date;
+  date: string;
+  time: string;
   status: 'Pending' | 'Confirmed' | 'Cancelled' | 'Completed';
   paymentStatus: 'Paid' | 'Unpaid';
 }
@@ -34,5 +35,6 @@ export interface User {
 
 export interface GalleryImage {
     id: string;
-    imageId: string;
+    imageUrl: string;
+    description: string;
 }

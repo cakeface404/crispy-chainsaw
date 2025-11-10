@@ -1,10 +1,22 @@
+"use client";
+
 import Image from 'next/image';
-import { galleryImages } from '@/lib/data';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useCollection, useFirestore } from '@/firebase';
+import { collection } from 'firebase/firestore';
+import type { GalleryImage } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
+import { useMemo } from 'react';
 
 export default function GalleryPage() {
+  const firestore = useFirestore();
+  const galleryCollection = useMemo(() => firestore ? collection(firestore, 'gallery') : null, [firestore]);
+  const { data: galleryImages, isLoading } = useCollection<GalleryImage>(galleryCollection);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col">
       <Header />
@@ -20,21 +32,18 @@ export default function GalleryPage() {
           </div>
 
           <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-            {galleryImages.map(image => {
-              const galleryImage = PlaceHolderImages.find(img => img.id === image.imageId);
-              return galleryImage ? (
-                <div key={image.id} className="overflow-hidden rounded-lg shadow-lg break-inside-avoid">
-                  <Image
-                    src={galleryImage.imageUrl}
-                    alt={galleryImage.description}
-                    data-ai-hint={galleryImage.imageHint}
-                    width={500}
-                    height={Math.floor(Math.random() * (600 - 400 + 1)) + 400}
-                    className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              ) : null;
-            })}
+            {galleryImages?.map(image => (
+              <div key={image.id} className="overflow-hidden rounded-lg shadow-lg break-inside-avoid">
+                <Image
+                  src={image.imageUrl}
+                  alt={image.description || 'Gallery image'}
+                  data-ai-hint={image.description || 'salon work'}
+                  width={500}
+                  height={Math.floor(Math.random() * (600 - 400 + 1)) + 400}
+                  className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </main>
