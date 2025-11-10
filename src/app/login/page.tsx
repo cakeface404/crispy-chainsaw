@@ -37,15 +37,13 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       // On successful sign-in, the onAuthStateChanged listener in useAuth will update the state.
       // The AdminLayout will then handle the redirect to '/admin' if the user is an admin.
-      // We don't need to manually push or set loading state here.
       toast({ title: 'Sign-In Successful', description: 'Redirecting to admin panel...' });
     } catch (error: any) {
-      // The toast in the previous version was incorrect. A user might not be an admin, but their password is correct.
-      // The old error message was confusing.
+      // Provide a clear error message for invalid credentials.
       toast({ 
         variant: 'destructive', 
-        title: 'Access Denied', 
-        description: 'You do not have permission to access the admin panel.' 
+        title: 'Authentication Failed', 
+        description: 'The email or password you entered is incorrect. Please try again.' 
       });
       setIsLoading(false);
     }
