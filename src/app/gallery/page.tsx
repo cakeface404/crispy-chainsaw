@@ -1,16 +1,15 @@
 "use client";
 
 import Image from 'next/image';
-import { useCollection, useFirestore } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
 import { collection } from 'firebase/firestore';
 import type { GalleryImage } from '@/lib/types';
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
-import { useMemo } from 'react';
 
 export default function GalleryPage() {
   const firestore = useFirestore();
-  const galleryCollection = useMemo(() => firestore ? collection(firestore, 'gallery') : null, [firestore]);
+  const galleryCollection = useMemoFirebase(() => firestore ? collection(firestore, 'gallery') : null, [firestore]);
   const { data: galleryImages, isLoading } = useCollection<GalleryImage>(galleryCollection);
 
   if (isLoading) {

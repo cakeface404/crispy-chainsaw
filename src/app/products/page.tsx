@@ -6,14 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { ShoppingCart } from "lucide-react";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { Product } from "@/lib/types";
-import { useMemo } from "react";
 
 export default function ProductsPage() {
   const firestore = useFirestore();
-  const productsCollection = useMemo(() => firestore ? collection(firestore, 'products') : null, [firestore]);
+  const productsCollection = useMemoFirebase(() => firestore ? collection(firestore, 'products') : null, [firestore]);
   const { data: products, isLoading } = useCollection<Product>(productsCollection);
 
   if (isLoading) {

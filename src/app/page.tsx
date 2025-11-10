@@ -9,16 +9,15 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { Service, GalleryImage } from "@/lib/types";
-import { useMemo } from "react";
 
 export default function Home() {
   const firestore = useFirestore();
 
-  const servicesCollection = useMemo(() => firestore ? collection(firestore, 'services') : null, [firestore]);
-  const galleryCollection = useMemo(() => firestore ? collection(firestore, 'gallery') : null, [firestore]);
+  const servicesCollection = useMemoFirebase(() => firestore ? collection(firestore, 'services') : null, [firestore]);
+  const galleryCollection = useMemoFirebase(() => firestore ? collection(firestore, 'gallery') : null, [firestore]);
   
   const { data: services, isLoading: servicesLoading } = useCollection<Service>(servicesCollection);
   const { data: galleryImages, isLoading: galleryLoading } = useCollection<GalleryImage>(galleryCollection);

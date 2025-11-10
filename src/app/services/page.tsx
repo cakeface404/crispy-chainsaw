@@ -6,14 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Header from "@/components/layout/header";
 import Footer from "@/components/layout/footer";
-import { useCollection, useFirestore } from "@/firebase";
+import { useCollection, useFirestore, useMemoFirebase } from "@/firebase";
 import { collection } from "firebase/firestore";
 import type { Service } from "@/lib/types";
-import { useMemo } from "react";
 
 export default function ServicesPage() {
   const firestore = useFirestore();
-  const servicesCollection = useMemo(() => firestore ? collection(firestore, 'services') : null, [firestore]);
+  const servicesCollection = useMemoFirebase(() => firestore ? collection(firestore, 'services') : null, [firestore]);
   const { data: services, isLoading } = useCollection<Service>(servicesCollection);
 
   if (isLoading) {
