@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -19,10 +19,12 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // This effect will run when auth state is resolved, and redirects if already logged in as admin.
-  if (!isAuthLoading && isAdmin) {
-    router.push('/admin');
-  }
+  // Redirect if a user who is already a logged-in admin lands on this page.
+  useEffect(() => {
+    if (!isAuthLoading && isAdmin) {
+      router.push('/admin');
+    }
+  }, [isAuthLoading, isAdmin, router]);
   
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,15 +35,26 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // The `onAuthStateChanged` listener in the main Firebase provider (`useAuth` hook)
-      // will now handle the state change and the redirect will be triggered by the AdminLayout.
-      toast({ title: 'Signing In...', description: 'Please wait while we verify your credentials.' });
-      // No need to set isLoading to false or push router here, the layout handles it.
+      // On successful sign-in, the onAuthStateChanged listener in useAuth will update the state.
+      // The AdminLayout will then handle the redirect to '/admin' if the user is an admin.
+      // We don't need to manually push or set loading state here.
+      toast({ title: 'Sign-In Successful', description: 'Redirecting to admin panel...' });
     } catch (error: any) {
-      toast({ variant: 'destructive', title: 'Authentication Failed', description: 'The email or password you entered is incorrect.' });
+      // The toast in the previous version was incorrect. A user might not be an admin, but their password is correct.
+      // The old error message was confusing.
+      toast({ 
+        variant: 'destructive', 
+        title: 'Access Denied', 
+        description: 'You do not have permission to access the admin panel.' 
+      });
       setIsLoading(false);
     }
   };
+
+  // Render a loading state or nothing if we're still checking auth and the user might be an admin
+  if (isAuthLoading || isAdmin) {
+    return <div className="flex h-screen w-full items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
@@ -57,7 +70,7 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="admin@example.com"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
