@@ -16,11 +16,11 @@ import { LayoutDashboard, Calendar, Sparkles, ShoppingBag, Bot, Settings } from 
 import Link from "next/link";
 
 const menuItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { href: "/admin/trends", label: "AI Trends", icon: Bot },
-  { href: "/admin/services", label: "Services", icon: Sparkles },
-  { href: "/admin/products", label: "Products", icon: ShoppingBag },
+  { href: "/bw-admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/bw-admin/bookings", label: "Bookings", icon: Calendar },
+  { href: "/bw-admin/trends", label: "AI Trends", icon: Bot },
+  { href: "/bw-admin/services", label: "Services", icon: Sparkles },
+  { href: "/bw-admin/products", label: "Products", icon: ShoppingBag },
 ];
 
 export default function AdminLayout({
