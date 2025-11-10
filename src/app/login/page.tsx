@@ -36,6 +36,7 @@ export default function LoginPage() {
       // The `onAuthStateChanged` listener in the main Firebase provider (`useAuth` hook)
       // will now handle the state change and the redirect will be triggered by the AdminLayout.
       toast({ title: 'Signing In...', description: 'Please wait while we verify your credentials.' });
+      // No need to set isLoading to false or push router here, the layout handles it.
     } catch (error: any) {
       toast({ variant: 'destructive', title: 'Authentication Failed', description: 'The email or password you entered is incorrect.' });
       setIsLoading(false);
