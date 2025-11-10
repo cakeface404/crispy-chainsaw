@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   SidebarProvider,
   Sidebar,
@@ -12,7 +12,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarInset,
   SidebarContent,
   SidebarFooter,
 } from "@/components/ui/sidebar";
@@ -20,7 +19,6 @@ import { Logo } from "@/components/logo";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LayoutDashboard, Calendar, Sparkles, ShoppingBag, Bot, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
-import { getIdTokenResult } from 'firebase/auth';
 
 const menuItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -35,59 +33,39 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isUserLoading } = useAuth();
-  const auth = useAuth();
+  // The useAuth hook now provides all the necessary state.
+  const { user, isAdmin, isAuthLoading, signOut } = useAuth();
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
 
   useEffect(() => {
-    if (isUserLoading) {
+    // Wait until the authentication check is complete.
+    if (isAuthLoading) {
       return;
     }
 
-    if (!user) {
+    // If the check is done and the user is not an admin (or not logged in),
+    // redirect them away.
+    if (!isAdmin) {
       router.push('/login');
-      return;
     }
-
-    const checkAdminStatus = async () => {
-      try {
-        const idTokenResult = await getIdTokenResult(user);
-        const isAdminClaim = idTokenResult.claims.admin === true;
-        
-        if (isAdminClaim) {
-          setIsAdmin(true);
-        } else {
-          router.push('/login');
-        }
-      } catch (error) {
-        console.error("Error checking admin status:", error);
-        router.push('/login');
-      } finally {
-        setIsCheckingAdmin(false);
-      }
-    };
-
-    checkAdminStatus();
-
-  }, [user, isUserLoading, router]);
+  }, [user, isAdmin, isAuthLoading, router]);
 
   const handleSignOut = async () => {
-    if (auth) {
-      await auth.signOut();
-      router.push('/login');
-    }
+    await signOut();
+    router.push('/login');
   };
 
-  if (isUserLoading || isCheckingAdmin) {
+  // While checking auth, show a loading screen.
+  if (isAuthLoading) {
     return <div className="flex h-screen w-full items-center justify-center">Loading Admin Panel...</div>;
   }
   
+  // If not an admin, show a redirecting message while the useEffect above does its work.
   if (!isAdmin) {
-    return <div className="flex h-screen w-full items-center justify-center">Redirecting...</div>;
+    return <div className="flex h-screen w-full items-center justify-center">Access Denied. Redirecting...</div>;
   }
 
+  // Only render the admin layout if the user is a confirmed admin.
   return (
     <SidebarProvider>
       <div className="flex min-h-screen">
@@ -138,13 +116,13 @@ export default function AdminLayout({
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        <SidebarInset className="bg-muted/30">
+        <div className="flex-1 bg-muted/30">
           <header className="flex h-16 items-center gap-4 border-b bg-background px-6">
             <SidebarTrigger />
             <h1 className="text-lg font-semibold">Admin Panel</h1>
           </header>
           <main className="flex-1 p-6">{children}</main>
-        </SidebarInset>
+        </div>
       </div>
     </SidebarProvider>
   );

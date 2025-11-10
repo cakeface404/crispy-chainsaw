@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -67,11 +68,12 @@ export function DataTable<TData, TValue>({
   return (
     <div>
         <div className="flex items-center py-4">
+            {/* UPDATED: Filter by 'status' since 'user.name' is no longer available here */}
             <Input
-            placeholder="Filter by client name..."
-            value={(table.getColumn("user.name")?.getFilterValue() as string) ?? ""}
+            placeholder="Filter by status..."
+            value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-                table.getColumn("user.name")?.setFilterValue(event.target.value)
+                table.getColumn("status")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
             />
@@ -97,6 +99,7 @@ export function DataTable<TData, TValue>({
                             column.toggleVisibility(!!value)
                             }
                         >
+                            {/* Note: 'user.name' will no longer appear here. */}
                             {column.id}
                         </DropdownMenuCheckboxItem>
                         )

@@ -550,6 +550,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$auth$2f$dist$2f$esm$2f$index$2e$esm$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$module__evaluation$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/auth/dist/esm/index.esm.js [app-client] (ecmascript) <module evaluation>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$8e6e89cb$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__z__as__onAuthStateChanged$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/node_modules/@firebase/auth/dist/esm2017/index-8e6e89cb.js [app-client] (ecmascript) <export z as onAuthStateChanged>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$8e6e89cb$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__ap__as__getIdTokenResult$3e$__ = __turbopack_context__.i("[project]/node_modules/firebase/node_modules/@firebase/auth/dist/esm2017/index-8e6e89cb.js [app-client] (ecmascript) <export ap as getIdTokenResult>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$FirebaseErrorListener$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/FirebaseErrorListener.tsx [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.signature(), _s2 = __turbopack_context__.k.signature(), _s3 = __turbopack_context__.k.signature(), _s4 = __turbopack_context__.k.signature(), _s5 = __turbopack_context__.k.signature(), _s6 = __turbopack_context__.k.signature();
@@ -562,51 +563,75 @@ const FirebaseProvider = ({ children, firebaseApp, firestore, auth })=>{
     _s();
     const [userAuthState, setUserAuthState] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
         user: null,
-        isUserLoading: true,
+        isAdmin: false,
+        isAuthLoading: true,
         userError: null
     });
-    // Effect to subscribe to Firebase auth state changes
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "FirebaseProvider.useEffect": ()=>{
             if (!auth) {
                 setUserAuthState({
                     user: null,
-                    isUserLoading: false,
+                    isAdmin: false,
+                    isAuthLoading: false,
                     userError: new Error("Auth service not provided.")
                 });
                 return;
             }
             setUserAuthState({
-                user: null,
-                isUserLoading: true,
-                userError: null
-            }); // Reset on auth instance change
+                "FirebaseProvider.useEffect": (prevState)=>({
+                        ...prevState,
+                        isAuthLoading: true
+                    })
+            }["FirebaseProvider.useEffect"]);
             const unsubscribe = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$8e6e89cb$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__z__as__onAuthStateChanged$3e$__["onAuthStateChanged"])(auth, {
-                "FirebaseProvider.useEffect.unsubscribe": (firebaseUser)=>{
-                    setUserAuthState({
-                        user: firebaseUser,
-                        isUserLoading: false,
-                        userError: null
-                    });
+                "FirebaseProvider.useEffect.unsubscribe": async (firebaseUser)=>{
+                    if (firebaseUser) {
+                        try {
+                            const idTokenResult = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$firebase$2f$node_modules$2f40$firebase$2f$auth$2f$dist$2f$esm2017$2f$index$2d$8e6e89cb$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__ap__as__getIdTokenResult$3e$__["getIdTokenResult"])(firebaseUser);
+                            const isAdminClaim = idTokenResult.claims.admin === true;
+                            setUserAuthState({
+                                user: firebaseUser,
+                                isAdmin: isAdminClaim,
+                                isAuthLoading: false,
+                                userError: null
+                            });
+                        } catch (error) {
+                            console.error("FirebaseProvider: Error getting ID token:", error);
+                            setUserAuthState({
+                                user: firebaseUser,
+                                isAdmin: false,
+                                isAuthLoading: false,
+                                userError: error
+                            });
+                        }
+                    } else {
+                        setUserAuthState({
+                            user: null,
+                            isAdmin: false,
+                            isAuthLoading: false,
+                            userError: null
+                        });
+                    }
                 }
             }["FirebaseProvider.useEffect.unsubscribe"], {
                 "FirebaseProvider.useEffect.unsubscribe": (error)=>{
                     console.error("FirebaseProvider: onAuthStateChanged error:", error);
                     setUserAuthState({
                         user: null,
-                        isUserLoading: false,
+                        isAdmin: false,
+                        isAuthLoading: false,
                         userError: error
                     });
                 }
             }["FirebaseProvider.useEffect.unsubscribe"]);
             return ({
                 "FirebaseProvider.useEffect": ()=>unsubscribe()
-            })["FirebaseProvider.useEffect"]; // Cleanup
+            })["FirebaseProvider.useEffect"];
         }
     }["FirebaseProvider.useEffect"], [
         auth
-    ]); // Depends on the auth instance
-    // Memoize the context value
+    ]);
     const contextValue = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "FirebaseProvider.useMemo[contextValue]": ()=>{
             const servicesAvailable = !!(firebaseApp && firestore && auth);
@@ -616,7 +641,8 @@ const FirebaseProvider = ({ children, firebaseApp, firestore, auth })=>{
                 firestore: servicesAvailable ? firestore : null,
                 auth: servicesAvailable ? auth : null,
                 user: userAuthState.user,
-                isUserLoading: userAuthState.isUserLoading,
+                isAdmin: userAuthState.isAdmin,
+                isAuthLoading: userAuthState.isAuthLoading,
                 userError: userAuthState.userError
             };
         }
@@ -631,18 +657,18 @@ const FirebaseProvider = ({ children, firebaseApp, firestore, auth })=>{
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$FirebaseErrorListener$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["FirebaseErrorListener"], {}, void 0, false, {
                 fileName: "[project]/src/firebase/provider.tsx",
-                lineNumber: 108,
+                lineNumber: 127,
                 columnNumber: 7
             }, this),
             children
         ]
     }, void 0, true, {
         fileName: "[project]/src/firebase/provider.tsx",
-        lineNumber: 107,
+        lineNumber: 126,
         columnNumber: 5
     }, this);
 };
-_s(FirebaseProvider, "OHe6bVjVSw9ThvW0Yh4MUWnvKSA=");
+_s(FirebaseProvider, "/NdTvOkjSjhI3qVhc3B2VcZHGug=");
 _c = FirebaseProvider;
 const useFirebase = ()=>{
     _s1();
@@ -658,17 +684,31 @@ const useFirebase = ()=>{
         firestore: context.firestore,
         auth: context.auth,
         user: context.user,
-        isUserLoading: context.isUserLoading,
+        isAdmin: context.isAdmin,
+        isAuthLoading: context.isAuthLoading,
         userError: context.userError
     };
 };
 _s1(useFirebase, "b9L3QQ+jgeyIrH0NfHrJ8nn7VMU=");
 const useAuth = ()=>{
     _s2();
-    const { auth } = useFirebase();
-    return auth;
+    const { auth, user, isAdmin, isAuthLoading, userError } = useFirebase();
+    const signOut = ()=>{
+        if (auth) {
+            return auth.signOut();
+        }
+        return Promise.resolve();
+    };
+    return {
+        auth,
+        user,
+        isAdmin,
+        isAuthLoading,
+        userError,
+        signOut
+    };
 };
-_s2(useAuth, "OT++aEmwDNADnnUbJWMr+/+OlXk=", false, function() {
+_s2(useAuth, "9aJCT14VRfC8KqtOMLFFaXJOvq4=", false, function() {
     return [
         useFirebase
     ];
@@ -703,14 +743,15 @@ function useMemoFirebase(factory, deps) {
 _s5(useMemoFirebase, "KMI6DIONdD7isGYT+tL7kc0anjg=");
 const useUser = ()=>{
     _s6();
-    const { user, isUserLoading, userError } = useFirebase(); // Leverages the main hook
+    const { user, isAdmin, isAuthLoading, userError } = useFirebase();
     return {
         user,
-        isUserLoading,
+        isAdmin,
+        isAuthLoading,
         userError
     };
 };
-_s6(useUser, "huZTQEv0vojfA8ahUwgbOjgU01Y=", false, function() {
+_s6(useUser, "rRFUF0jq9TQ5/5HfGiLUKqFo72s=", false, function() {
     return [
         useFirebase
     ];
