@@ -7,7 +7,7 @@ import type { Booking, Service, User } from "@/lib/types";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { useMemo } from "react";
-import { useAuth } from "@/firebase/provider";
+import { useAuth } from "@/firebase";
 
 type BookingWithDetails = Booking & {
   service: Service | undefined;

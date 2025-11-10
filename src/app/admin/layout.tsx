@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useAuth } from '@/firebase';
+import { useAuth, useFirestore } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
@@ -20,7 +21,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LayoutDashboard, Calendar, Sparkles, ShoppingBag, Bot, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
 import { doc, getDoc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 
 const menuItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -42,24 +42,34 @@ export default function AdminLayout({
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(true);
 
   useEffect(() => {
-    if (!isUserLoading) {
-      if (user) {
-        const checkAdminStatus = async () => {
-          const adminDocRef = doc(firestore, 'admins', user.uid);
-          const adminDoc = await getDoc(adminDocRef);
-          if (adminDoc.exists()) {
-            setIsAdmin(true);
-          } else {
-            router.push('/login');
-          }
-          setIsCheckingAdmin(false);
-        };
-        checkAdminStatus();
-      } else {
-        router.push('/login');
-        setIsCheckingAdmin(false);
-      }
+    if (isUserLoading) {
+      // Still waiting for auth state to be determined
+      return;
     }
+
+    if (!user) {
+      // No user, redirect to login
+      router.push('/login');
+      return;
+    }
+
+    // User is logged in, check for admin role
+    const checkAdminStatus = async () => {
+      if (firestore) {
+        const adminDocRef = doc(firestore, 'admins', user.uid);
+        const adminDoc = await getDoc(adminDocRef);
+        if (adminDoc.exists()) {
+          setIsAdmin(true);
+        } else {
+          // Not an admin, redirect
+          router.push('/login');
+        }
+      }
+      setIsCheckingAdmin(false);
+    };
+
+    checkAdminStatus();
+
   }, [user, isUserLoading, firestore, router]);
 
   const handleSignOut = async () => {
@@ -70,11 +80,12 @@ export default function AdminLayout({
   };
 
   if (isUserLoading || isCheckingAdmin) {
-    return <div>Loading...</div>; // Or a proper loading spinner
+    return <div className="flex h-screen w-full items-center justify-center">Loading Admin Panel...</div>;
   }
   
   if (!isAdmin) {
-    return null; // or a message indicating not authorized
+    // This will be briefly visible before the redirect in useEffect completes
+    return <div className="flex h-screen w-full items-center justify-center">Redirecting...</div>;
   }
 
   return (
