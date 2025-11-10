@@ -109,7 +109,7 @@ export const columns: ColumnDef<BookingWithDetails>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <Link href={`/bw-admin/invoice/${booking.id}`}>View Invoice</Link>
+              <Link href={`/admin/invoice/${booking.id}`}>View Invoice</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Confirm Booking</DropdownMenuItem>
